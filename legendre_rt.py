@@ -122,12 +122,11 @@ def get_legfactors_00_binav(ell_array, theta_edges):
     factor = (2 * ell_array + 1) / (4 * np.pi)
     return factor * Pl_bar
 
-def get_legfactors_02_binav(ell_array, theta_edges, mode='plus'):
+def get_legfactors_02_binav(ell_array, theta_edges):
     """
     式 (5.14) を全ビン・全ellに対して一括計算
     """
     x_edges = np.cos(theta_edges)
-    sign = '+' if mode == 'plus' else '-'
     
     # ell < 2 の処理（呼び出し前に実行）
     mask = ell_array < 2
@@ -148,6 +147,7 @@ def get_legfactors_22_binav(ell_array, theta_edges, mode='plus'):
     式 (5.14) を全ビン・全ellに対して一括計算
     """
     x_edges = np.cos(theta_edges)
+    sign = '+' if mode == 'plus' else '-'
     
     # ell < 2 の処理（呼び出し前に実行）
     mask = ell_array < 2
