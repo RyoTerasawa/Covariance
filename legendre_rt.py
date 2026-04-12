@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.special import legendre_p_all
 
-
 def get_bin_averaged_Pl(ell, x_edges):
     """
     式 (5.6) に基づき、各ビンの P_bar_l を計算
@@ -95,7 +94,7 @@ def get_bin_averaged_G2l(ell, x_edges, sign='+'):
     term5 = (ell[:, None] + 2) * (x_edges * dp_lm1 - p_lm1)
     
     s = 1.0 if sign == '+' else -1.0
-    term6_7 = s * 2.0 * (((ell - 1) * (x_edges * dp_l - p_l)) - (ell[:, None] + 2) * dp_lm1)
+    term6_7 = s * 2.0 * (((ell[:, None] - 1) * (x_edges * dp_l - p_l)) - (ell[:, None] + 2) * dp_lm1)
     
     vals = term1 + term2 + term3 + term4 + term5 + term6_7
     
