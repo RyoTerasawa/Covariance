@@ -64,7 +64,7 @@ def get_bin_averaged_P2l(ell, x_edges):
     return (delta_vals / delta_x).T  # (n_bins, len(ell)) に転置
 
 
-def get_bin_averaged_G2l(ell, x_edges, sign='+'):
+def get_bin_averaged_G2l(ell, x_edges, sign):
     """
     式 (5.8) に基づき、各ビンの G_bar_l,2 を計算
     legendre_p_all を使用して効率化
@@ -93,8 +93,7 @@ def get_bin_averaged_G2l(ell, x_edges, sign='+'):
     term4 = (4 - ell[:, None]) * dp_l
     term5 = (ell[:, None] + 2) * (x_edges * dp_lm1 - p_lm1)
     
-    s = 1.0 if sign == '+' else -1.0
-    term6_7 = s * 2.0 * (((ell[:, None] - 1) * (x_edges * dp_l - p_l)) - (ell[:, None] + 2) * dp_lm1)
+    term6_7 = sign * 2.0 * (((ell[:, None] - 1) * (x_edges * dp_l - p_l)) - (ell[:, None] + 2) * dp_lm1)
     
     vals = term1 + term2 + term3 + term4 + term5 + term6_7
     
@@ -141,12 +140,11 @@ def get_legfactors_02_binav(ell_array, theta_edges):
 
 
 
-def get_legfactors_22_binav(ell_array, theta_edges, mode='plus'):
+def get_legfactors_22_binav(ell_array, theta_edges, sign):
     """
     式 (5.14) を全ビン・全ellに対して一括計算
     """
     x_edges = np.cos(theta_edges)
-    sign = '+' if mode == 'plus' else '-'
     
     # ell < 2 の処理（呼び出し前に実行）
     mask = ell_array < 2
