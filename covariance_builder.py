@@ -1168,7 +1168,25 @@ class CovarianceProjectedReal(CovarianceReal):
                     # for 22
                     Npair = np.array([d.get_tag("weight") for d in D])
                     
-                    # TODO: calculate Npair from mask
+                    # Fallback: estimate Npair from the survey mask when
+                    # catalog pair counts are not stored in the sacc file.
+                    # N_pair(θ) = n_1 * n_2 * Ω_eff * 2π |Δcosθ|
+                    if Npair[0] is None and self.mask_files is not None:
+                        t1, t2 = tracer_comb1
+                        if t1 in self.Ngal and t2 in self.Ngal:
+                            tracer_names = {1: t1, 2: t2, 3: t1, 4: t2}
+                            masks = self.get_masks_dict(tracer_names)
+                            # Overlap mask and effective survey area [sr]
+                            mask_12 = masks[1] * masks[2]
+                            Omega_eff = (
+                                np.sum(mask_12) * 4 * np.pi / len(mask_12)
+                            )
+                            N1 = self.Ngal[t1] * Omega_eff
+                            N2 = self.Ngal[t2] * Omega_eff
+                            # 2π|Δcosθ| is the ring solid angle per bin
+                            Npair = (
+                                N1 * N2 * 2 * np.pi * np.abs(dcost) / Omega_eff
+                            )
 
                     # TODO; check factor 2
 
