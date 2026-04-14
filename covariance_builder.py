@@ -1163,28 +1163,40 @@ class CovarianceProjectedReal(CovarianceReal):
                         data_type, (tracer_comb1[0], tracer_comb1[1])
                     )
                     Npair = np.array([d.get_tag("npair") for d in D])
+
+                    # TODO: for 22 we need weighted pair count; the 
                     # for 22
                     Npair = np.array([d.get_tag("weight") for d in D])
                     
+                    # TODO: calculate Npair from mask
+
+                    # TODO; check factor 2
 
                     if Npair[0] is None:
                         # assuming no survey boundaries.
-                        if np.abs(s1_s2_1[0]) == np.abs(s1_s2_1[1]) == 2:
-                            SN *= 2
+                        match (s1_s2_1):
+                            case (2, 2) | (2, -2) | (-2, 2):
+                                SN *= 2
 
                         cov_sn = SN / (np.pi * dcost)
                     else:
                         # catalog level N_pair from treecorr
-                        T_sn = 1
-                        if tracer_comb1[0] in self.sigma_e:
-                            T_sn *= self.sigma_e[tracer_comb1[0]] ** 2
-                        if tracer_comb1[1] in self.sigma_e:
-                            T_sn *= self.sigma_e[tracer_comb1[1]] ** 2
+                        match (s1_s2_1):
+                            # Eq. 85 of https://arxiv.org/abs/2212.08568
+                            case (0, 0):
+                                T_sn = 1
 
-                        if (tracer_comb1[0] in self.sigma_e) and (
-                            tracer_comb1[1] in self.sigma_e
-                        ):
-                            T_sn *= 2
+                            # Eq. 89 of https://arxiv.org/abs/2212.08568
+                            case (0, 2):
+                                T_sn = self.sigma_e[tracer_comb1[1]] ** 2
+                            case (2, 0):
+                                T_sn = self.sigma_e[tracer_comb1[0]] ** 2
+
+                            # Eq. 92 of https://arxiv.org/abs/2212.08568
+                            case (2, 2) | (2, -2) | (-2, 2):
+                                T_sn = 2 * self.sigma_e[tracer_comb1[0]] ** 4
+                        
+                        
                         # Eq. 64 of https://arxiv.org/abs/2410.06962
                         cov_sn = 2 * T_sn / Npair
 
